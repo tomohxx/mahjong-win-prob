@@ -34,7 +34,7 @@ std::unordered_map<Key, std::valarray<double>, Hash> cache;
 
 std::valarray<double> WinProb::select1(std::vector<int>& hand,
                                        std::vector<int>& wall,
-                                       const int num,
+                                       int num,
                                        const int sht,
                                        const int mode,
                                        const int64_t wait,
@@ -50,19 +50,21 @@ std::valarray<double> WinProb::select1(std::vector<int>& hand,
   std::valarray<double> tmp(0., params.t_max + 1);
 
   for (int i = 0; i < K; ++i) {
-    if (wait & (1LL << i) && wall[i] > 0) {
+    if (wall[i] > 0 && (wait & (1LL << i))) {
       const int a = wall[i];
 
       ++hand[i];
       --wall[i];
+      ++num;
 
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
 
       sum += a;
-      tmp += a * select2(hand, wall, num + 1, sht - 1, mode, _disc, params);
+      tmp += a * select2(hand, wall, num, _sht, _mode, _disc, params);
 
       --hand[i];
       ++wall[i];
+      --num;
     }
   }
 
@@ -77,7 +79,7 @@ std::valarray<double> WinProb::select1(std::vector<int>& hand,
 
 std::valarray<double> WinProb::select2(std::vector<int>& hand,
                                        std::vector<int>& wall,
-                                       const int num,
+                                       int num,
                                        const int sht,
                                        const int mode,
                                        const int64_t disc,
@@ -96,16 +98,20 @@ std::valarray<double> WinProb::select2(std::vector<int>& hand,
   std::valarray<double> ret(0., params.t_max + 1);
 
   for (int i = 0; i < K; ++i) {
-    if (disc & (1LL << i)) {
+    if (hand[i] > 0 && (disc & (1LL << i))) {
       --hand[i];
+      --num;
 
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
 
       ret = std::max(ret,
-                     select1(hand, wall, num - 1, sht, mode, _wait, params),
-                     [&params](const auto& x, const auto& y) { return x[params.t_curr] < y[params.t_curr]; });
+                     select1(hand, wall, num, _sht, _mode, _wait, params),
+                     [&params](const auto& x, const auto& y) {
+                       return x[params.t_curr] < y[params.t_curr];
+                     });
 
       ++hand[i];
+      ++num;
     }
   }
 
@@ -135,11 +141,11 @@ std::vector<Stat> WinProb::operator()(std::vector<int>& hand, const Params& para
   const auto [sht, mode, disc, wait] = calsht(hand, num / 3, mode_in);
 
   for (int i = 0; i < K; ++i) {
-    if (disc & (1LL << i)) {
+    if (hand[i] > 0 && (disc & (1LL << i))) {
       --hand[i];
 
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
-      const auto tmp = select1(hand, wall, num - 1, sht, mode_in, _wait, params);
+      const auto tmp = select1(hand, wall, num - 1, _sht, _mode, _wait, params);
 
       ret.emplace_back(Stat{i, tmp});
 

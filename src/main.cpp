@@ -50,7 +50,8 @@ int main()
       {30, "4z"},
       {31, "5z"},
       {32, "6z"},
-      {33, "7z"}};
+      {33, "7z"},
+  };
 
   calsht.initialize(INDEX_FILE_PATH);
 
@@ -63,11 +64,12 @@ int main()
 
   std::cout << "The shanten number is " << sht - 1 << std::endl;
 
-  const Params params{
+  Params params{
       .t_min = 0,
       .t_max = 18,
       .t_curr = 1,
-      .sum = 123};
+      .sum = 123,
+  };
 
   const auto start = std::chrono::system_clock::now();
   const auto stats = win_prob(hand, params);
