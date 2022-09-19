@@ -1,6 +1,7 @@
 #include <bitset>
 #include <chrono>
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <string>
@@ -75,36 +76,36 @@ int main()
   const auto [stats, searched] = win_prob(hand, params);
   const auto end = std::chrono::system_clock::now();
 
-  std::cout << "=== Params ===" << std::endl;
-  std::cout << "t_min:  " << params.t_min << std::endl;
-  std::cout << "t_max:  " << params.t_max << std::endl;
-  std::cout << "t_curr: " << params.t_curr << std::endl;
-  std::cout << "sum:    " << params.sum << std::endl;
-  std::cout << "=== Result ===" << std::endl;
-  std::cout << "Turn\t";
+  std::cout << "=== Params ===\n";
+  std::cout << "t_min:  " << params.t_min << "\n";
+  std::cout << "t_max:  " << params.t_max << "\n";
+  std::cout << "t_curr: " << params.t_curr << "\n";
+  std::cout << "sum:    " << params.sum << "\n";
+  std::cout << "=== Result ===\n";
+  std::cout << std::setw(8) << std::left << "Turn";
 
   for (const auto& stat : stats) {
-    std::cout << label[stat.tile] << "\t";
+    std::cout << std::setw(8) << label[stat.tile];
   }
 
-  std::cout << std::endl;
+  std::cout << "\n";
   std::cout << std::fixed;
 
   for (int t = params.t_curr; t <= params.t_max; ++t) {
-    std::cout << t << "\t";
+    std::cout << std::setw(8) << t;
 
     for (const auto& stat : stats) {
-      std::cout << std::setprecision(4) << stat.prob[t] << "\t";
+      std::cout << std::setw(8) << std::setprecision(4) << stat.prob[t];
     }
 
-    std::cout << std::endl;
+    std::cout << "\n";
   }
 
-  std::cout << "==== Info ====" << std::endl;
+  std::cout << "==== Info ====\n";
   std::cout << "Time (msec.): "
             << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-            << std::endl;
-  std::cout << "Searched:     " << searched << std::endl;
+            << "\n";
+  std::cout << "Searched:     " << searched << "\n";
 
   return 0;
 }
