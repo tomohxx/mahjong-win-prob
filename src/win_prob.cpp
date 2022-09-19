@@ -118,7 +118,7 @@ std::valarray<double> WinProb::select2(std::vector<int>& hand,
   return cache[key] = ret;
 }
 
-std::vector<Stat> WinProb::operator()(std::vector<int>& hand, const Params& params)
+std::tuple<std::vector<Stat>, std::size_t> WinProb::operator()(std::vector<int>& hand, const Params& params)
 {
   assert(params.t_min >= 0);
   assert(params.t_min < params.t_max);
@@ -136,9 +136,11 @@ std::vector<Stat> WinProb::operator()(std::vector<int>& hand, const Params& para
     wall[i] = 4 - hand[i];
   }
 
-  std::vector<Stat> ret;
+  std::vector<Stat> stats;
 
   const auto [sht, mode, disc, wait] = calsht(hand, num / 3, mode_in);
+
+  cache.clear();
 
   for (int i = 0; i < K; ++i) {
     if (hand[i] > 0 && (disc & (1LL << i))) {
@@ -147,13 +149,15 @@ std::vector<Stat> WinProb::operator()(std::vector<int>& hand, const Params& para
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
       const auto tmp = select1(hand, wall, num - 1, _sht, _mode, _wait, params);
 
-      ret.emplace_back(Stat{i, tmp});
+      stats.emplace_back(Stat{i, tmp});
 
       ++hand[i];
     }
   }
 
+  const auto searched = cache.size();
+
   cache.clear();
 
-  return ret;
+  return {stats, searched};
 }

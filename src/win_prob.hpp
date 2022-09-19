@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <tuple>
 #include <valarray>
 #include <vector>
 #include "calsht_dw.hpp"
@@ -42,7 +43,7 @@ private:
 public:
   WinProb(const CalshtDW& _calsht, const int _mode_in)
       : calsht(_calsht), mode_in(_mode_in) {}
-  std::vector<Stat> operator()(std::vector<int>& hand, const Params& params);
+  std::tuple<std::vector<Stat>, std::size_t> operator()(std::vector<int>& hand, const Params& params);
 };
 
 #endif

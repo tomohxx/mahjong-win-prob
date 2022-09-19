@@ -72,7 +72,7 @@ int main()
   };
 
   const auto start = std::chrono::system_clock::now();
-  const auto stats = win_prob(hand, params);
+  const auto [stats, searched] = win_prob(hand, params);
   const auto end = std::chrono::system_clock::now();
 
   std::cout << "=== Params ===" << std::endl;
@@ -80,7 +80,7 @@ int main()
   std::cout << "t_max:  " << params.t_max << std::endl;
   std::cout << "t_curr: " << params.t_curr << std::endl;
   std::cout << "sum:    " << params.sum << std::endl;
-  std::cout << "=== RESURT ===" << std::endl;
+  std::cout << "=== Result ===" << std::endl;
   std::cout << "Turn\t";
 
   for (const auto& stat : stats) {
@@ -100,9 +100,11 @@ int main()
     std::cout << std::endl;
   }
 
+  std::cout << "==== Info ====" << std::endl;
   std::cout << "Time (msec.): "
             << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
             << std::endl;
+  std::cout << "Searched:     " << searched << std::endl;
 
   return 0;
 }
