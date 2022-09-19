@@ -6,8 +6,8 @@
 #include "win_prob.hpp"
 
 struct Key {
-  const std::vector<int> hand;
-  const std::vector<int> wall;
+  const std::vector<int>& hand;
+  const std::vector<int>& wall;
 };
 
 struct Hash {
