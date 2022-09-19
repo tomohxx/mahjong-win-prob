@@ -56,10 +56,15 @@ std::valarray<double> WinProb::select1(std::vector<int>& hand,
       --wall[i];
       ++num;
 
-      const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
-
       sum += a;
-      tmp += a * select2(hand, wall, num, _sht, _disc, params);
+
+      if (sht == 1) {
+        tmp += a * select2(hand, wall, num, 0, 0LL, params);
+      }
+      else {
+        const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
+        tmp += a * select2(hand, wall, num, _sht, _disc, params);
+      }
 
       --hand[i];
       ++wall[i];
