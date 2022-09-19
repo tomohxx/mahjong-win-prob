@@ -36,7 +36,6 @@ std::valarray<double> WinProb::select1(std::vector<int>& hand,
                                        std::vector<int>& wall,
                                        int num,
                                        const int sht,
-                                       const int mode,
                                        const int64_t wait,
                                        const Params& params)
 {
@@ -60,7 +59,7 @@ std::valarray<double> WinProb::select1(std::vector<int>& hand,
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
 
       sum += a;
-      tmp += a * select2(hand, wall, num, _sht, _mode, _disc, params);
+      tmp += a * select2(hand, wall, num, _sht, _disc, params);
 
       --hand[i];
       ++wall[i];
@@ -81,7 +80,6 @@ std::valarray<double> WinProb::select2(std::vector<int>& hand,
                                        std::vector<int>& wall,
                                        int num,
                                        const int sht,
-                                       const int mode,
                                        const int64_t disc,
                                        const Params& params)
 {
@@ -105,7 +103,7 @@ std::valarray<double> WinProb::select2(std::vector<int>& hand,
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
 
       ret = std::max(ret,
-                     select1(hand, wall, num, _sht, _mode, _wait, params),
+                     select1(hand, wall, num, _sht, _wait, params),
                      [&params](const auto& x, const auto& y) {
                        return x[params.t_curr] < y[params.t_curr];
                      });
@@ -147,7 +145,7 @@ std::tuple<std::vector<Stat>, std::size_t> WinProb::operator()(std::vector<int>&
       --hand[i];
 
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
-      const auto tmp = select1(hand, wall, num - 1, _sht, _mode, _wait, params);
+      const auto tmp = select1(hand, wall, num - 1, _sht, _wait, params);
 
       stats.emplace_back(Stat{i, tmp});
 

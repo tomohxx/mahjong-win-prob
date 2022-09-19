@@ -29,14 +29,12 @@ private:
                                 std::vector<int>& wall,
                                 int num,
                                 int sht,
-                                int mode,
                                 int64_t wait,
                                 const Params& params);
   std::valarray<double> select2(std::vector<int>& hand,
                                 std::vector<int>& wall,
                                 int num,
                                 int sht,
-                                int mode,
                                 int64_t disc,
                                 const Params& params);
 
