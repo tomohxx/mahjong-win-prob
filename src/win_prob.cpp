@@ -7,39 +7,29 @@
 
 struct Key {
   const std::vector<int>& hand;
-  const std::vector<int>& wall;
 };
 
 struct Hash {
   std::size_t operator()(const Key& key) const
   {
-    using boost::hash_combine;
-    using boost::hash_range;
-
-    std::size_t seed = 0;
-
-    hash_combine(seed, hash_range(key.hand.begin(), key.hand.end()));
-    hash_combine(seed, hash_range(key.wall.begin(), key.wall.end()));
-
-    return seed;
+    return boost::hash_range(key.hand.begin(), key.hand.end());
   }
 };
 
 bool operator==(const Key& lhs, const Key& rhs)
 {
-  return lhs.hand == rhs.hand && lhs.wall == rhs.wall;
+  return lhs.hand == rhs.hand;
 }
 
 std::unordered_map<Key, std::valarray<double>, Hash> cache;
 
 std::valarray<double> WinProb::select1(std::vector<int>& hand,
-                                       std::vector<int>& wall,
                                        int num,
                                        const int sht,
                                        const int64_t wait,
                                        const Params& params)
 {
-  const Key key{hand, wall};
+  const Key key{hand};
 
   if (const auto itr = cache.find(key); itr != cache.end()) {
     return itr->second;
@@ -49,25 +39,23 @@ std::valarray<double> WinProb::select1(std::vector<int>& hand,
   std::valarray<double> tmp(0., params.t_max + 1);
 
   for (int i = 0; i < K; ++i) {
-    if (wall[i] > 0 && (wait & (1LL << i))) {
-      const int a = wall[i];
+    if (hand[i] < 4 && (wait & (1LL << i))) {
+      const int a = 4 - hand[i];
 
       ++hand[i];
-      --wall[i];
       ++num;
 
       sum += a;
 
       if (sht == 1) {
-        tmp += a * select2(hand, wall, num, 0, 0LL, params);
+        tmp += a * select2(hand, num, 0, 0LL, params);
       }
       else {
         const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
-        tmp += a * select2(hand, wall, num, _sht, _disc, params);
+        tmp += a * select2(hand, num, _sht, _disc, params);
       }
 
       --hand[i];
-      ++wall[i];
       --num;
     }
   }
@@ -82,13 +70,12 @@ std::valarray<double> WinProb::select1(std::vector<int>& hand,
 }
 
 std::valarray<double> WinProb::select2(std::vector<int>& hand,
-                                       std::vector<int>& wall,
                                        int num,
                                        const int sht,
                                        const int64_t disc,
                                        const Params& params)
 {
-  const Key key{hand, wall};
+  const Key key{hand};
 
   if (const auto itr = cache.find(key); itr != cache.end()) {
     return itr->second;
@@ -108,7 +95,7 @@ std::valarray<double> WinProb::select2(std::vector<int>& hand,
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
 
       ret = std::max(ret,
-                     select1(hand, wall, num, _sht, _wait, params),
+                     select1(hand, num, _sht, _wait, params),
                      [&params](const auto& x, const auto& y) {
                        return x[params.t_curr] < y[params.t_curr];
                      });
@@ -133,12 +120,6 @@ std::tuple<std::vector<Stat>, std::size_t> WinProb::operator()(std::vector<int>&
 
   assert(num % 3 == 2);
 
-  std::vector<int> wall(K);
-
-  for (int i = 0; i < K; ++i) {
-    wall[i] = 4 - hand[i];
-  }
-
   std::vector<Stat> stats;
 
   const auto [sht, mode, disc, wait] = calsht(hand, num / 3, mode_in);
@@ -150,7 +131,7 @@ std::tuple<std::vector<Stat>, std::size_t> WinProb::operator()(std::vector<int>&
       --hand[i];
 
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
-      const auto tmp = select1(hand, wall, num - 1, _sht, _wait, params);
+      const auto tmp = select1(hand, num - 1, _sht, _wait, params);
 
       stats.emplace_back(Stat{i, tmp});
 
