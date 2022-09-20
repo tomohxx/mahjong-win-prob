@@ -1,8 +1,6 @@
 #ifndef MJFFS_HPP
 #define MJFFS_HPP
 
-#include <cstdint>
-#include <optional>
 #include <tuple>
 #include <valarray>
 #include <vector>
