@@ -5,23 +5,14 @@
 #include "constant.hpp"
 #include "win_prob.hpp"
 
-struct Key {
-  const std::vector<int> hand;
-};
-
 struct Hash {
-  std::size_t operator()(const Key& key) const
+  std::size_t operator()(const std::vector<int>& hand) const
   {
-    return boost::hash_range(key.hand.begin(), key.hand.end());
+    return boost::hash_range(hand.begin(), hand.end());
   }
 };
 
-bool operator==(const Key& lhs, const Key& rhs)
-{
-  return lhs.hand == rhs.hand;
-}
-
-std::unordered_map<Key, std::valarray<double>, Hash> cache;
+std::unordered_map<std::vector<int>, std::valarray<double>, Hash> cache;
 
 std::valarray<double> WinProb::select1(std::vector<int>& hand,
                                        int num,
@@ -29,9 +20,7 @@ std::valarray<double> WinProb::select1(std::vector<int>& hand,
                                        const int64_t wait,
                                        const Params& params)
 {
-  const Key key{hand};
-
-  if (const auto itr = cache.find(key); itr != cache.end()) {
+  if (const auto itr = cache.find(hand); itr != cache.end()) {
     return itr->second;
   }
 
@@ -66,7 +55,7 @@ std::valarray<double> WinProb::select1(std::vector<int>& hand,
     ret[t] = (1. - static_cast<double>(sum) / (params.sum - t)) * ret[t + 1] + tmp[t + 1] / (params.sum - t);
   }
 
-  return cache[key] = ret;
+  return cache[hand] = ret;
 }
 
 std::valarray<double> WinProb::select2(std::vector<int>& hand,
@@ -75,9 +64,7 @@ std::valarray<double> WinProb::select2(std::vector<int>& hand,
                                        const int64_t disc,
                                        const Params& params)
 {
-  const Key key{hand};
-
-  if (const auto itr = cache.find(key); itr != cache.end()) {
+  if (const auto itr = cache.find(hand); itr != cache.end()) {
     return itr->second;
   }
 
@@ -105,7 +92,7 @@ std::valarray<double> WinProb::select2(std::vector<int>& hand,
     }
   }
 
-  return cache[key] = ret;
+  return cache[hand] = ret;
 }
 
 std::tuple<std::vector<Stat>, std::size_t> WinProb::operator()(std::vector<int>& hand, const Params& params)
