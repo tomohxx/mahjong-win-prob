@@ -66,7 +66,6 @@ int main()
   Params params{
       .t_min = 0,
       .t_max = 18,
-      .t_curr = 1,
       .sum = 123,
   };
 
@@ -77,7 +76,6 @@ int main()
   std::cout << "=== Params ===\n";
   std::cout << "t_min:  " << params.t_min << "\n";
   std::cout << "t_max:  " << params.t_max << "\n";
-  std::cout << "t_curr: " << params.t_curr << "\n";
   std::cout << "sum:    " << params.sum << "\n";
   std::cout << "=== Result ===\n";
   std::cout << std::setw(8) << std::left << "Turn";
@@ -89,7 +87,7 @@ int main()
   std::cout << "\n";
   std::cout << std::fixed;
 
-  for (int t = params.t_curr; t <= params.t_max; ++t) {
+  for (int t = 1; t <= params.t_max; ++t) {
     std::cout << std::setw(8) << t;
 
     for (const auto& stat : stats) {

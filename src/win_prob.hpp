@@ -14,7 +14,6 @@ struct Stat {
 struct Params {
   int t_min = 0;  // 最小巡目
   int t_max = 0;  // 最大巡目
-  int t_curr = 0; // 現在の巡目
   int sum = 0;    // 最小巡目での牌の枚数
 };
 

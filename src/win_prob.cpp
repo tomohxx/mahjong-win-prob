@@ -80,12 +80,11 @@ std::valarray<double> WinProb::select2(std::vector<int>& hand,
       --num;
 
       const auto [_sht, _mode, _disc, _wait] = calsht(hand, num / 3, mode_in);
+      const auto tmp = select1(hand, num, _sht, _wait, params);
 
-      ret = std::max(ret,
-                     select1(hand, num, _sht, _wait, params),
-                     [&params](const auto& x, const auto& y) {
-                       return x[params.t_curr] < y[params.t_curr];
-                     });
+      for (int j = params.t_min; j <= params.t_max; ++j) {
+        ret[j] = std::max(ret[j], tmp[j]);
+      }
 
       ++hand[i];
       ++num;
@@ -99,9 +98,6 @@ std::tuple<std::vector<Stat>, std::size_t> WinProb::operator()(std::vector<int>&
 {
   assert(params.t_min >= 0);
   assert(params.t_min < params.t_max);
-  assert(params.t_curr >= params.t_min);
-  assert(params.t_curr <= params.t_max);
-  assert(params.t_curr >= 1);
 
   const int num = std::accumulate(hand.begin(), hand.end(), 0);
 
