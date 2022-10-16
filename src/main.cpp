@@ -64,7 +64,7 @@ int main()
   std::cout << "The shanten number is " << sht - 1 << std::endl;
 
   Params params{
-      .t_min = 0,
+      .t_min = 1,
       .t_max = 18,
       .sum = 123,
   };
@@ -87,7 +87,7 @@ int main()
   std::cout << "\n";
   std::cout << std::fixed;
 
-  for (int t = 1; t <= params.t_max; ++t) {
+  for (int t = params.t_min; t <= params.t_max; ++t) {
     std::cout << std::setw(8) << t;
 
     for (const auto& stat : stats) {

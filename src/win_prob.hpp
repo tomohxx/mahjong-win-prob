@@ -1,21 +1,10 @@
-#ifndef MJFFS_HPP
-#define MJFFS_HPP
+#ifndef WIN_PROB_HPP
+#define WIN_PROB_HPP
 
 #include <tuple>
-#include <valarray>
 #include <vector>
 #include "calsht_dw.hpp"
-
-struct Stat {
-  const int tile;                   // 打牌
-  const std::valarray<double> prob; // 和了確率
-};
-
-struct Params {
-  int t_min = 0;  // 最小巡目
-  int t_max = 0;  // 最大巡目
-  int sum = 0;    // 最小巡目での牌の枚数
-};
+#include "utils.hpp"
 
 class WinProb {
 private:
@@ -25,12 +14,10 @@ private:
   std::valarray<double> select1(std::vector<int>& hand,
                                 int num,
                                 int sht,
-                                int64_t wait,
                                 const Params& params);
   std::valarray<double> select2(std::vector<int>& hand,
                                 int num,
                                 int sht,
-                                int64_t disc,
                                 const Params& params);
 
 public:
