@@ -17,3 +17,5 @@ add_definitions(-DINDEX_FILE_PATH="${PROJECT_BINARY_DIR}")
 include_directories(${lib})
 
 add_executable(main src/main.cpp src/win_prob.cpp ${lib}/calsht_dw.cpp)
+add_executable(main2 src/main.cpp src/win_prob2.cpp ${lib}/calsht_dw.cpp)
+target_compile_definitions(main2 PRIVATE WIN_PROB2)

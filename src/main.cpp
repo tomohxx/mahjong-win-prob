@@ -5,7 +5,11 @@
 #include <string>
 #include "calsht_dw.hpp"
 #include "settile.hpp"
+#ifdef WIN_PROB2
+#include "win_prob2.hpp"
+#else
 #include "win_prob.hpp"
+#endif
 
 int main()
 {
@@ -14,7 +18,11 @@ int main()
   std::string str;
   std::vector<int> hand(K, 0);
   CalshtDW calsht;
+#ifdef WIN_PROB2
+  WinProb2 win_prob(calsht, MODE);
+#else
   WinProb win_prob(calsht, MODE);
+#endif
   std::map<int, std::string> label = {
       {0, "1m"},
       {1, "2m"},
@@ -54,20 +62,24 @@ int main()
 
   calsht.initialize(INDEX_FILE_PATH);
 
+  Params params{
+      .t_min = 1,
+      .t_max = 18,
+      .sum = 123,
+  };
+
   std::cout << "Enter " << M << " tiles" << std::endl;
   std::cin >> str;
+#ifdef WIN_PROB2
+  std::cout << "Enter the number of extra drawings" << std::endl;
+  std::cin >> params.extra;
+#endif
 
   set_tile(str, hand);
 
   const auto [sht, mode, disc, wait] = calsht(hand, M / 3, MODE);
 
   std::cout << "The shanten number is " << sht - 1 << std::endl;
-
-  Params params{
-      .t_min = 1,
-      .t_max = 18,
-      .sum = 123,
-  };
 
   const auto start = std::chrono::system_clock::now();
   const auto [stats, searched] = win_prob(hand, params);
@@ -77,6 +89,7 @@ int main()
   std::cout << "t_min:  " << params.t_min << "\n";
   std::cout << "t_max:  " << params.t_max << "\n";
   std::cout << "sum:    " << params.sum << "\n";
+  std::cout << "extra:  " << params.extra << "\n";
   std::cout << "=== Result ===\n";
   std::cout << std::setw(8) << std::left << "Turn";
 
