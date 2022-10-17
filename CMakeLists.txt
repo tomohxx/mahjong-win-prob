@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.1)
 project(mahjong-win-prob)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -DCHECK_HAND")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -Wextra -fsplit-stack -g -DCHECK_HAND")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra -fsplit-stack")
 set(lib ${PROJECT_SOURCE_DIR}/src/necessary-and-unnecessary-tiles)
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E tar zxvf ${lib}/index_dw.tar.gz
