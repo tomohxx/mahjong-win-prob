@@ -71,7 +71,7 @@ int main()
   std::cout << "Enter " << M << " tiles" << std::endl;
   std::cin >> str;
 #ifdef WIN_PROB2
-  std::cout << "Enter the number of extra drawings" << std::endl;
+  std::cout << "Enter the number of extra tiles" << std::endl;
   std::cin >> params.extra;
 #endif
 
