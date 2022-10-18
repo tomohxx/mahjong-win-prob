@@ -1,5 +1,7 @@
 #include <cassert>
+#include <cfloat>
 #include <numeric>
+#include <stdexcept>
 #include <unordered_map>
 #include <boost/graph/graph_utility.hpp>
 #include "constant.hpp"
@@ -58,11 +60,11 @@ Graph::vertex_descriptor WinProb2::select1(std::vector<int>& hand,
 
   for (int i = 0; i < K; ++i) {
     if (all & (1LL << i)) {
-      const int a = 4 - (hand[i]++);
+      const int weight = 4 - (hand[i]++);
       const auto target = select2(hand, num + 1, origin, sht_org, params);
 
       if (!boost::edge(desc, target, graph).second) {
-        boost::add_edge(desc, target, a, graph);
+        boost::add_edge(desc, target, weight, graph);
       }
 
       --hand[i];
@@ -90,11 +92,11 @@ Graph::vertex_descriptor WinProb2::select2(std::vector<int>& hand,
 
   for (int i = 0; i < K; ++i) {
     if (all & (1LL << i)) {
-      const int a = 4 - (--hand[i]);
+      const int weight = 4 - (--hand[i]);
       const auto source = select1(hand, num - 1, origin, sht_org, params);
 
       if (!boost::edge(source, desc, graph).second) {
-        boost::add_edge(source, desc, a, graph);
+        boost::add_edge(source, desc, weight, graph);
       }
 
       ++hand[i];
@@ -109,13 +111,25 @@ void WinProb2::update(const Params& params)
   for (int t = params.t_max - 1; t >= params.t_min; --t) {
     for (auto& [hand, desc] : desc1) {
       auto& prob = graph[desc];
+      int sum = 0;
 
       for (auto [first, last] = boost::out_edges(desc, graph); first != last; ++first) {
         const auto target = boost::target(*first, graph);
-        prob[t] += graph[*first] * (graph[target][t + 1] - prob[t + 1]);
+        const auto weight = graph[*first];
+        const auto delta = graph[target][t + 1] - prob[t + 1];
+
+        if (delta > DBL_EPSILON) {
+          prob[t] += weight * delta;
+          sum += weight;
+        }
       }
 
-      prob[t] = prob[t + 1] + prob[t] / (params.sum - t);
+      if (const auto tmp = params.sum - t; sum > tmp) {
+        throw std::runtime_error("Inconsistent calculation");
+      }
+      else {
+        prob[t] = prob[t + 1] + prob[t] / tmp;
+      }
     }
 
     for (auto& [hand, desc] : desc2) {
@@ -123,6 +137,7 @@ void WinProb2::update(const Params& params)
 
       for (auto [first, last] = boost::in_edges(desc, graph); first != last; ++first) {
         const auto source = boost::source(*first, graph);
+
         prob[t] = std::max(prob[t], graph[source][t]);
       }
     }
