@@ -1,7 +1,5 @@
 #include <cassert>
-#include <cfloat>
 #include <numeric>
-#include <stdexcept>
 #include <unordered_map>
 #include <boost/graph/graph_utility.hpp>
 #include "constant.hpp"
@@ -111,25 +109,14 @@ void WinProb2::update(const Params& params)
   for (int t = params.t_max - 1; t >= params.t_min; --t) {
     for (auto& [hand, desc] : desc1) {
       auto& prob = graph[desc];
-      int sum = 0;
 
       for (auto [first, last] = boost::out_edges(desc, graph); first != last; ++first) {
         const auto target = boost::target(*first, graph);
-        const auto weight = graph[*first];
-        const auto delta = graph[target][t + 1] - prob[t + 1];
 
-        if (delta > DBL_EPSILON) {
-          prob[t] += weight * delta;
-          sum += weight;
-        }
+        prob[t] += graph[*first] * (graph[target][t + 1] - prob[t + 1]);
       }
 
-      if (const auto tmp = params.sum - t; sum > tmp) {
-        throw std::runtime_error("Inconsistent calculation");
-      }
-      else {
-        prob[t] = prob[t + 1] + prob[t] / tmp;
-      }
+      prob[t] = prob[t + 1] + prob[t] / (params.sum - t);
     }
 
     for (auto& [hand, desc] : desc2) {
