@@ -1,7 +1,7 @@
+#include <array>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
-#include <map>
 #include <string>
 #include "calsht_dw.hpp"
 #include "settile.hpp"
@@ -23,42 +23,11 @@ int main()
 #else
   WinProb win_prob(calsht, MODE);
 #endif
-  std::map<int, std::string> label = {
-      {0, "1m"},
-      {1, "2m"},
-      {2, "3m"},
-      {3, "4m"},
-      {4, "5m"},
-      {5, "6m"},
-      {6, "7m"},
-      {7, "8m"},
-      {8, "9m"},
-      {9, "1p"},
-      {10, "2p"},
-      {11, "3p"},
-      {12, "4p"},
-      {13, "5p"},
-      {14, "6p"},
-      {15, "7p"},
-      {16, "8p"},
-      {17, "9p"},
-      {18, "1s"},
-      {19, "2s"},
-      {20, "3s"},
-      {21, "4s"},
-      {22, "5s"},
-      {23, "6s"},
-      {24, "7s"},
-      {25, "8s"},
-      {26, "9s"},
-      {27, "1z"},
-      {28, "2z"},
-      {29, "3z"},
-      {30, "4z"},
-      {31, "5z"},
-      {32, "6z"},
-      {33, "7z"},
-  };
+  std::array<std::string, K> label = {
+      "1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
+      "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p",
+      "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
+      "1z", "2z", "3z", "4z", "5z", "6z", "7z"};
 
   calsht.initialize(INDEX_FILE_PATH);
 
