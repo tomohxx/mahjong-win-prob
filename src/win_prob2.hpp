@@ -13,33 +13,37 @@ using Graph = boost::adjacency_list<boost::listS,
                                     std::valarray<double>,
                                     int>;
 
+struct Hash {
+  std::size_t operator()(const std::vector<int>& hand) const
+  {
+    return boost::hash_range(hand.begin(), hand.end());
+  }
+};
+
+using Desc = std::unordered_map<std::vector<int>, Graph::vertex_descriptor, Hash>;
+
 class WinProb2 {
 private:
-  struct Hash {
-    std::size_t operator()(const std::vector<int>& hand) const
-    {
-      return boost::hash_range(hand.begin(), hand.end());
-    }
-  };
-
   const CalshtDW& calsht;
   const int mode_in;
 
-  Graph graph;
-  std::unordered_map<std::vector<int>, Graph::vertex_descriptor, Hash> desc1;
-  std::unordered_map<std::vector<int>, Graph::vertex_descriptor, Hash> desc2;
-
-  Graph::vertex_descriptor select1(std::vector<int>& hand,
+  Graph::vertex_descriptor select1(Graph& graph,
+                                   Desc& desc1,
+                                   Desc& desc2,
+                                   std::vector<int>& hand,
                                    int num,
                                    const std::vector<int>& origin,
                                    int sht_org,
                                    const Params& params);
-  Graph::vertex_descriptor select2(std::vector<int>& hand,
+  Graph::vertex_descriptor select2(Graph& graph,
+                                   Desc& desc1,
+                                   Desc& desc2,
+                                   std::vector<int>& hand,
                                    int num,
                                    const std::vector<int>& origin,
                                    int sht_org,
                                    const Params& params);
-  void update(const Params& params);
+  void update(Graph& graph, const Desc& desc1, const Desc& desc2, const Params& params);
 
 public:
   WinProb2(const CalshtDW& _calsht, const int _mode_in)

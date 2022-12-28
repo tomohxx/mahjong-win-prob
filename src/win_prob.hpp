@@ -3,21 +3,32 @@
 
 #include <tuple>
 #include <vector>
+#include <unordered_map>
+#include <boost/container_hash/hash.hpp>
 #include "calsht_dw.hpp"
 #include "utils.hpp"
+
+struct Hash {
+  std::size_t operator()(const std::vector<int>& hand) const
+  {
+    return boost::hash_range(hand.begin(), hand.end());
+  }
+};
+
+using Cache = std::unordered_map<std::vector<int>, std::valarray<double>, Hash>;
 
 class WinProb {
 private:
   const CalshtDW& calsht;
   const int mode_in;
 
-  std::valarray<double> select1(std::vector<int>& hand,
+  std::valarray<double> select1(Cache& cache,
+                                std::vector<int>& hand,
                                 int num,
-                                int sht,
                                 const Params& params);
-  std::valarray<double> select2(std::vector<int>& hand,
+  std::valarray<double> select2(Cache& cache,
+                                std::vector<int>& hand,
                                 int num,
-                                int sht,
                                 const Params& params);
 
 public:

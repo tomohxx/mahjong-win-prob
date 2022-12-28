@@ -40,7 +40,10 @@ int distance(const std::vector<int>& hand, const std::vector<int>& origin)
                             [](const int x, const int y) { return std::max(x - y, 0); });
 }
 
-Graph::vertex_descriptor WinProb2::select1(std::vector<int>& hand,
+Graph::vertex_descriptor WinProb2::select1(Graph& graph,
+                                           Desc& desc1,
+                                           Desc& desc2,
+                                           std::vector<int>& hand,
                                            const int num,
                                            const std::vector<int>& origin,
                                            const int sht_org,
@@ -59,7 +62,7 @@ Graph::vertex_descriptor WinProb2::select1(std::vector<int>& hand,
   for (int i = 0; i < K; ++i) {
     if (all & (1LL << i)) {
       const int weight = 4 - (hand[i]++);
-      const auto target = select2(hand, num + 1, origin, sht_org, params);
+      const auto target = select2(graph, desc1, desc2, hand, num + 1, origin, sht_org, params);
 
       if (!boost::edge(desc, target, graph).second) {
         boost::add_edge(desc, target, weight, graph);
@@ -72,7 +75,10 @@ Graph::vertex_descriptor WinProb2::select1(std::vector<int>& hand,
   return desc;
 }
 
-Graph::vertex_descriptor WinProb2::select2(std::vector<int>& hand,
+Graph::vertex_descriptor WinProb2::select2(Graph& graph,
+                                           Desc& desc1,
+                                           Desc& desc2,
+                                           std::vector<int>& hand,
                                            const int num,
                                            const std::vector<int>& origin,
                                            const int sht_org,
@@ -91,7 +97,7 @@ Graph::vertex_descriptor WinProb2::select2(std::vector<int>& hand,
   for (int i = 0; i < K; ++i) {
     if (all & (1LL << i)) {
       const int weight = 4 - (--hand[i]);
-      const auto source = select1(hand, num - 1, origin, sht_org, params);
+      const auto source = select1(graph, desc1, desc2, hand, num - 1, origin, sht_org, params);
 
       if (!boost::edge(source, desc, graph).second) {
         boost::add_edge(source, desc, weight, graph);
@@ -104,7 +110,7 @@ Graph::vertex_descriptor WinProb2::select2(std::vector<int>& hand,
   return desc;
 }
 
-void WinProb2::update(const Params& params)
+void WinProb2::update(Graph& graph, const Desc& desc1, const Desc& desc2, const Params& params)
 {
   for (int t = params.t_max - 1; t >= params.t_min; --t) {
     for (auto& [hand, desc] : desc1) {
@@ -144,12 +150,11 @@ std::tuple<std::vector<Stat>, std::size_t> WinProb2::operator()(std::vector<int>
 
   const auto [sht, mode, disc, wait] = calsht(hand, num / 3, mode_in);
 
-  graph.clear();
-  desc1.clear();
-  desc2.clear();
+  Graph graph;
+  Desc desc1, desc2;
 
-  select2(hand, num, std::vector<int>{hand}, sht, params);
-  update(params);
+  select2(graph, desc1, desc2, hand, num, std::vector<int>{hand}, sht, params);
+  update(graph, desc1, desc2, params);
 
   for (int i = 0; i < K; ++i) {
     if (hand[i] > 0) {
@@ -163,10 +168,6 @@ std::tuple<std::vector<Stat>, std::size_t> WinProb2::operator()(std::vector<int>
   }
 
   const auto searched = boost::num_vertices(graph);
-
-  graph.clear();
-  desc1.clear();
-  desc2.clear();
 
   return {stats, searched};
 }
