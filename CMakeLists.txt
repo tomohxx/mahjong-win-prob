@@ -12,7 +12,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E tar zxvf ${lib}/index_dw.tar.gz
 
 option(THREE_PLAYER "Three player mode" off)
 
-add_definitions(-DINDEX_FILE_PATH="${PROJECT_BINARY_DIR}")
+add_compile_definitions(INDEX_FILE_PATH="${PROJECT_BINARY_DIR}")
 
 include_directories(${lib})
 
