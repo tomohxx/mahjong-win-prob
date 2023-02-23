@@ -13,6 +13,7 @@ struct Params {
   int t_max = 0; // 最大巡目
   int sum = 0;   // 0巡目での牌の枚数
   int extra = 0; // 手替わり回数
+  int mode = 7;  // モード
 };
 
 #endif

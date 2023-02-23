@@ -25,7 +25,6 @@ using Desc = std::unordered_map<std::vector<int>, Graph::vertex_descriptor, Hash
 class WinProb2 {
 private:
   const CalshtDW& calsht;
-  const int mode_in;
 
   Graph::vertex_descriptor select1(Graph& graph,
                                    Desc& desc1,
@@ -46,8 +45,8 @@ private:
   void update(Graph& graph, const Desc& desc1, const Desc& desc2, const Params& params);
 
 public:
-  WinProb2(const CalshtDW& _calsht, const int _mode_in)
-      : calsht(_calsht), mode_in(_mode_in) {}
+  WinProb2(const CalshtDW& _calsht)
+      : calsht(_calsht) {}
   std::tuple<std::vector<Stat>, std::size_t> operator()(std::vector<int>& hand, const Params& params);
 };
 

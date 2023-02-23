@@ -19,9 +19,9 @@ int main()
   std::vector<int> hand(K, 0);
   CalshtDW calsht;
 #ifdef WIN_PROB2
-  WinProb2 win_prob(calsht, MODE);
+  WinProb2 win_prob(calsht);
 #else
-  WinProb win_prob(calsht, MODE);
+  WinProb win_prob(calsht);
 #endif
   std::array<std::string, K> label = {
       "1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
@@ -35,6 +35,7 @@ int main()
       .t_min = 1,
       .t_max = 18,
       .sum = 123,
+      .mode = MODE,
   };
 
   std::cout << "Enter " << M << " tiles" << std::endl;
@@ -59,6 +60,7 @@ int main()
   std::cout << "t_max:  " << params.t_max << "\n";
   std::cout << "sum:    " << params.sum << "\n";
   std::cout << "extra:  " << params.extra << "\n";
+  std::cout << "mode:   " << params.mode << "\n";
   std::cout << "=== Result ===\n";
   std::cout << std::setw(8) << std::left << "Turn";
 

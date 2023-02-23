@@ -53,7 +53,7 @@ Graph::vertex_descriptor WinProb2::select1(Graph& graph,
     return itr->second;
   }
 
-  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, mode_in);
+  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, params.mode);
   const auto all = distance(hand, origin) + sht < sht_org + params.extra ? calc_wait2(hand) : wait;
   const auto desc = boost::add_vertex(std::valarray<double>(0., params.t_max + 1), graph);
 
@@ -88,7 +88,7 @@ Graph::vertex_descriptor WinProb2::select2(Graph& graph,
     return itr->second;
   }
 
-  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, mode_in);
+  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, params.mode);
   const auto all = distance(hand, origin) + sht < sht_org + params.extra ? calc_disc2(hand) : disc;
   const auto desc = boost::add_vertex(std::valarray<double>(!sht, params.t_max + 1), graph);
 
@@ -148,7 +148,7 @@ std::tuple<std::vector<Stat>, std::size_t> WinProb2::operator()(std::vector<int>
 
   std::vector<Stat> stats;
 
-  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, mode_in);
+  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, params.mode);
 
   Graph graph;
   Desc desc1, desc2;

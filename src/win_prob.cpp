@@ -12,7 +12,7 @@ std::valarray<double> WinProb::select1(Cache& cache,
     return itr->second;
   }
 
-  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, mode_in);
+  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, params.mode);
   int sum = 0;
   std::valarray<double> tmp(0., params.t_max + 1);
 
@@ -47,7 +47,7 @@ std::valarray<double> WinProb::select2(Cache& cache,
     return itr->second;
   }
 
-  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, mode_in);
+  const auto [sht, mode, disc, wait] = calsht(hand, num / 3, params.mode);
   std::valarray<double> ret(0., params.t_max + 1);
 
   for (int i = 0; i < K; ++i) {

@@ -20,7 +20,6 @@ using Cache = std::unordered_map<std::vector<int>, std::valarray<double>, Hash>;
 class WinProb {
 private:
   const CalshtDW& calsht;
-  const int mode_in;
 
   std::valarray<double> select1(Cache& cache,
                                 std::vector<int>& hand,
@@ -32,8 +31,8 @@ private:
                                 const Params& params);
 
 public:
-  WinProb(const CalshtDW& _calsht, const int _mode_in)
-      : calsht(_calsht), mode_in(_mode_in) {}
+  WinProb(const CalshtDW& _calsht)
+      : calsht(_calsht) {}
   std::tuple<std::vector<Stat>, std::size_t> operator()(std::vector<int>& hand, const Params& params);
 };
 
