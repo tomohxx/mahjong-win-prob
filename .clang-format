@@ -15,4 +15,3 @@ NamespaceIndentation: All
 FixNamespaceComments: false
 PointerAlignment: Left
 ReferenceAlignment: Left
-SortIncludes: Never
