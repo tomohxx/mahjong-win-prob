@@ -1,53 +1,63 @@
+#include "necessary-and-unnecessary-tiles/src/calsht_dw.hpp"
+#include "settile.hpp"
+#include "win_prob1.hpp"
+#include "win_prob2.hpp"
 #include <array>
 #include <chrono>
-#include <iomanip>
+#include <filesystem>
+#include <format>
 #include <iostream>
+#include <memory>
 #include <string>
-#include "calsht_dw.hpp"
-#include "settile.hpp"
-#ifdef WIN_PROB2
-#include "win_prob2.hpp"
-#else
-#include "win_prob.hpp"
+#include <type_traits>
+#ifndef INDEX_FILE_PATH
+#define INDEX_FILE_PATH std::filesystem::current_path()
+#endif
+#ifndef WIN_PROB2
+#define WIN_PROB2 false
 #endif
 
 int main()
 {
-  constexpr int M = 14;
+  constexpr int NUM_TIDS = 34;
+  constexpr int NUM_TILES = 14;
   constexpr int MODE = 7;
   std::string str;
-  std::vector<int> hand(K, 0);
-  CalshtDW calsht;
-#ifdef WIN_PROB2
-  WinProb2 win_prob(calsht);
-#else
-  WinProb win_prob(calsht);
-#endif
-  std::array<std::string, K> label = {
+  std::vector<int> hand(NUM_TIDS, 0);
+  const auto calsht = std::make_shared<CalshtDW>();
+  const std::conditional<WIN_PROB2,
+                         win_prob::win_prob2::WinProb2,
+                         win_prob::win_prob1::WinProb1>::type win_prob(calsht);
+  const std::array<std::string, NUM_TIDS> label = {
       "1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
       "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p",
       "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
       "1z", "2z", "3z", "4z", "5z", "6z", "7z"};
 
-  calsht.initialize(INDEX_FILE_PATH);
+  calsht->initialize(INDEX_FILE_PATH);
 
-  Params params{
+  win_prob::Params params{
       .t_min = 1,
       .t_max = 18,
-      .sum = 123,
       .mode = MODE,
   };
 
-  std::cout << "Enter " << M << " tiles" << std::endl;
+  std::cout << std::format("Enter {} tiles\n", NUM_TILES);
   std::cin >> str;
-#ifdef WIN_PROB2
-  std::cout << "Enter the number of extra tiles" << std::endl;
-  std::cin >> params.extra;
-#endif
 
-  set_tile(str, hand);
+  if constexpr (WIN_PROB2) {
+    std::cout << "Enter the number of extra tiles" << std::endl;
+    std::cin >> params.extra;
+  }
 
-  const auto [sht, mode, disc, wait] = calsht(hand, M / 3, MODE);
+  std::cout << "Enter whether three-player(1/0)" << std::endl;
+  std::cin >> params.three_player;
+
+  params.sum = params.three_player ? 95 : 123;
+
+  set_tile(str, hand, params.three_player);
+
+  const auto [sht, mode, disc, wait] = (*calsht)(hand, NUM_TILES / 3, MODE, false, params.three_player);
 
   std::cout << "The shanten number is " << sht - 1 << std::endl;
 
@@ -56,36 +66,35 @@ int main()
   const auto end = std::chrono::system_clock::now();
 
   std::cout << "=== Params ===\n";
-  std::cout << "t_min:  " << params.t_min << "\n";
-  std::cout << "t_max:  " << params.t_max << "\n";
-  std::cout << "sum:    " << params.sum << "\n";
-  std::cout << "extra:  " << params.extra << "\n";
-  std::cout << "mode:   " << params.mode << "\n";
+  std::cout << std::format("t_min:        {:d}\n", params.t_min);
+  std::cout << std::format("t_max:        {:d}\n", params.t_max);
+  std::cout << std::format("sum:          {:d}\n", params.sum);
+  std::cout << std::format("extra:        {:d}\n", params.extra);
+  std::cout << std::format("mode:         {:d}\n", params.mode);
+  std::cout << std::format("three-player: {:s}\n", params.three_player);
   std::cout << "=== Result ===\n";
-  std::cout << std::setw(8) << std::left << "Turn";
+  std::cout << std::format("{:<8s}", "Turn");
 
   for (const auto& stat : stats) {
-    std::cout << std::setw(8) << label[stat.tile];
+    std::cout << std::format("{:<8s}", label[stat.tile]);
   }
 
   std::cout << "\n";
-  std::cout << std::fixed;
 
   for (int t = params.t_min; t <= params.t_max; ++t) {
-    std::cout << std::setw(8) << t;
+    std::cout << std::format("{:<8d}", t);
 
     for (const auto& stat : stats) {
-      std::cout << std::setw(8) << std::setprecision(4) << stat.prob[t];
+      std::cout << std::format("{:<8.4f}", stat.prob[t]);
     }
 
     std::cout << "\n";
   }
 
   std::cout << "==== Info ====\n";
-  std::cout << "Time (msec.): "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-            << "\n";
-  std::cout << "Searched:     " << searched << "\n";
+  std::cout << std::format("Time (msec.): {:d}\n",
+                           std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+  std::cout << std::format("Searched:     {:d}\n", searched);
 
   return 0;
 }
