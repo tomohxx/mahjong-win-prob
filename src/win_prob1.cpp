@@ -1,8 +1,6 @@
 #include "win_prob1.hpp"
 #include <cassert>
 #include <numeric>
-#define SKIP_WHEN_THREE_PLAYER \
-  if (params.three_player && i > 0 && i < 8) continue;
 constexpr int NUM_TIDS = 34;
 
 namespace win_prob::win_prob1 {
@@ -20,8 +18,6 @@ namespace win_prob::win_prob1 {
     std::valarray<double> tmp(0., params.t_max + 1);
 
     for (int i = 0; i < NUM_TIDS; ++i) {
-      SKIP_WHEN_THREE_PLAYER
-
       if (wait & (1ull << i)) {
         const int weight = 4 - hand[i];
 
@@ -56,8 +52,6 @@ namespace win_prob::win_prob1 {
     std::valarray<double> ret(0., params.t_max + 1);
 
     for (int i = 0; i < NUM_TIDS; ++i) {
-      SKIP_WHEN_THREE_PLAYER
-
       if (disc & (1ull << i)) {
         --hand[i];
 

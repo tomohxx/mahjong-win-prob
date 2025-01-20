@@ -2,16 +2,16 @@
 #include <boost/graph/graph_utility.hpp>
 #include <cassert>
 #include <numeric>
-#define SKIP_WHEN_THREE_PLAYER \
-  if (params.three_player && i > 0 && i < 8) continue;
+#define SKIP_WHEN_THREE_PLAYER(three_player) \
+  if (three_player && i > 0 && i < 8) continue;
 constexpr int NUM_TIDS = 34;
 
-uint64_t calc_disc2(const std::vector<int>& hand, const win_prob::Params& params)
+uint64_t calc_disc2(const std::vector<int>& hand, const bool three_player)
 {
   uint64_t ret = 0LL;
 
   for (int i = 0; i < NUM_TIDS; ++i) {
-    SKIP_WHEN_THREE_PLAYER
+    SKIP_WHEN_THREE_PLAYER(three_player)
 
     if (hand[i] > 0) {
       ret |= 1LL << i;
@@ -21,12 +21,12 @@ uint64_t calc_disc2(const std::vector<int>& hand, const win_prob::Params& params
   return ret;
 }
 
-uint64_t calc_wait2(const std::vector<int>& hand, const win_prob::Params& params)
+uint64_t calc_wait2(const std::vector<int>& hand, const bool three_player)
 {
   uint64_t ret = 0LL;
 
   for (int i = 0; i < NUM_TIDS; ++i) {
-    SKIP_WHEN_THREE_PLAYER
+    SKIP_WHEN_THREE_PLAYER(three_player)
 
     if (hand[i] < 4) {
       ret |= 1LL << i;
@@ -60,7 +60,7 @@ namespace win_prob::win_prob2 {
     }
 
     const auto [sht, mode, disc, wait] = (*calsht)(hand, num / 3, params.mode, false, params.three_player);
-    const auto dest = distance(hand, origin) + sht < sht_org + params.extra ? calc_wait2(hand, params) : wait;
+    const auto dest = distance(hand, origin) + sht < sht_org + params.extra ? calc_wait2(hand, params.three_player) : wait;
     const auto desc = boost::add_vertex(std::valarray<double>(0., params.t_max + 1), graph);
 
     desc1[hand] = desc;
@@ -102,7 +102,7 @@ namespace win_prob::win_prob2 {
     }
 
     const auto [sht, mode, disc, wait] = (*calsht)(hand, num / 3, params.mode, false, params.three_player);
-    const auto dest = distance(hand, origin) + sht < sht_org + params.extra ? calc_disc2(hand, params) : disc;
+    const auto dest = distance(hand, origin) + sht < sht_org + params.extra ? calc_disc2(hand, params.three_player) : disc;
     const auto desc = boost::add_vertex(std::valarray<double>(!sht, params.t_max + 1), graph);
 
     desc2[hand] = desc;
