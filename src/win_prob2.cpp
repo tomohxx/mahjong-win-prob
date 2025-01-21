@@ -2,8 +2,6 @@
 #include <boost/graph/graph_utility.hpp>
 #include <cassert>
 #include <numeric>
-#define SKIP_WHEN_THREE_PLAYER(three_player) \
-  if (three_player && i > 0 && i < 8) continue;
 constexpr int NUM_TIDS = 34;
 
 uint64_t calc_disc2(const std::vector<int>& hand, const bool three_player)
@@ -11,7 +9,7 @@ uint64_t calc_disc2(const std::vector<int>& hand, const bool three_player)
   uint64_t ret = 0LL;
 
   for (int i = 0; i < NUM_TIDS; ++i) {
-    SKIP_WHEN_THREE_PLAYER(three_player)
+    if (three_player && i > 0 && i < 8) continue;
 
     if (hand[i] > 0) {
       ret |= 1LL << i;
@@ -26,7 +24,7 @@ uint64_t calc_wait2(const std::vector<int>& hand, const bool three_player)
   uint64_t ret = 0LL;
 
   for (int i = 0; i < NUM_TIDS; ++i) {
-    SKIP_WHEN_THREE_PLAYER(three_player)
+    if (three_player && i > 0 && i < 8) continue;
 
     if (hand[i] < 4) {
       ret |= 1LL << i;
